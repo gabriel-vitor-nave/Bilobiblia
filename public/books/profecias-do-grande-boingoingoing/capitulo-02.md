@@ -1,4 +1,4 @@
-# Capítulo 2
+# Capítulo 2: O Juízo Final
 
 [1] Na segunda visão, vi a Boingaterra transformada em lugar de boing perfeito.
 

@@ -1,4 +1,4 @@
-# Capítulo 3: O Primeiro Boingoingoing
+# Capítulo 3
 
 [1] Certo dia o Furico se aproximou da árvore proibida e ficou olhando.
 

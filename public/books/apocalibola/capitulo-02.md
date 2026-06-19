@@ -1,4 +1,4 @@
-# Capítulo 2
+# Capítulo 2: O Novo Boing-Céu
 
 [1] E depois da grande leitura, o universo fará uma pausa de exatamente um boing.
 

@@ -1,4 +1,4 @@
-# Capítulo 1
+# Capítulo 1: As Sete Trombetas
 
 [1] A revelação final, transmitida por Bilola diretamente ao último dos profetas, em palavras de boing puro.
 

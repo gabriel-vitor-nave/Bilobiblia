@@ -26,18 +26,32 @@ const CHARS_PER_PAGE = 700;
  */
 function parseChapter(markdown, bookSlug, bookTitle, chapterNumber) {
   const verses = [];
-  const lines = markdown.split('\n');
+  const cleanMarkdown = markdown.replace(/\r/g, '');
+  const lines = cleanMarkdown.split('\n');
+  
+  // Try to find the chapter name from the first line (e.g. "# Capítulo 1: O Princípio do Boing")
+  let chapterName = '';
+  if (lines.length > 0) {
+    const headerMatch = lines[0].match(/^#\s+Cap[íi]tulo\s+\d+[:\-\s]+(.+)$/i);
+    if (headerMatch) {
+      chapterName = headerMatch[1].trim();
+    }
+  }
 
   for (const line of lines) {
     const match = line.match(/^\[(\d+)\]\s+(.+)$/);
     if (match) {
-      verses.push({
+      const verseObj = {
         book: bookTitle,
         bookSlug,
         chapter: chapterNumber,
         verse: parseInt(match[1], 10),
         text: match[2].trim(),
-      });
+      };
+      if (chapterName) {
+        verseObj.chapterName = chapterName;
+      }
+      verses.push(verseObj);
     }
   }
 

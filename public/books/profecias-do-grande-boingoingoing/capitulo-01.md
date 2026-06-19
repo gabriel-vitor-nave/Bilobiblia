@@ -1,4 +1,4 @@
-# Capítulo 1
+# Capítulo 1: A Revelação do Som
 
 [1] Estas são as visões de Boingoar, profeta do boing, filho de Boinguel, da tribo dos Boingadores do Monte.
 

@@ -1,4 +1,4 @@
-# Capítulo 1
+# Capítulo 1: O Reinado de Bilola
 
 [1] No primeiro ano do reinado do Grande Boingador Boingathos, a Boingaterra prosperou.
 

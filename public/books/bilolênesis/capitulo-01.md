@@ -1,8 +1,8 @@
-# Capítulo 1: O Princípio do Boing
+# Capítulo 1
 
 [1] No princípio, Bilola abriu a boca e disse: Boingoingoing.
 
-[2] E o universo boingou.
+[2] E o conceito nasceu.
 
 [3] Então surgiu o Furico das sombras do não-ser, e era confuso.
 

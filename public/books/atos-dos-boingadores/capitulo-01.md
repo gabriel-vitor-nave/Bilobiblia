@@ -1,4 +1,4 @@
-# Capítulo 1
+# Capítulo 1: A Reunião dos Guerreiros
 
 [1] No décimo ano da Era do Boing Renovado, os Boingadores partiram em missão sagrada.
 

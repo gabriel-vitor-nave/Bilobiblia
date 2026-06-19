@@ -1,4 +1,4 @@
-# Capítulo 2
+# Capítulo 2: O Caminho da Retidão
 
 [1] Mais provérbios dos sábios, coletados ao longo de muitas eras do boing.
 

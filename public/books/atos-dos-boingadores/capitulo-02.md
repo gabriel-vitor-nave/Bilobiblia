@@ -1,4 +1,4 @@
-# Capítulo 2
+# Capítulo 2: As Primeiras Boingadas
 
 [1] Depois da grande missão, os Boingadores retornaram ao Templo Central.
 

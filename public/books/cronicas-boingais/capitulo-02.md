@@ -1,4 +1,4 @@
-# Capítulo 2
+# Capítulo 2: A Dinastia do Boing
 
 [1] No terceiro ano de Boingathos, o Grande Boingador decidiu expandir o Templo Central.
 

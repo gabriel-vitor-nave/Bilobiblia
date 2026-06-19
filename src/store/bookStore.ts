@@ -12,6 +12,7 @@ function buildPages(verses: Verse[]): Page[] {
   const pages: Page[] = [];
   let currentPage: Page | null = null;
   let charCount = 0;
+  const bookPageCounts: Record<string, number> = {};
 
   for (const verse of verses) {
     const verseLength = verse.text.length + 20;
@@ -26,11 +27,16 @@ function buildPages(verses: Verse[]): Page[] {
       (currentPage.chapter !== verse.chapter && currentPage.verses.length > 0);
 
     if (needsNewPage) {
+      const slug = verse.bookSlug;
+      bookPageCounts[slug] = (bookPageCounts[slug] ?? 0) + 1;
+
       currentPage = {
         pageNumber: pages.length + 1,
+        localPageNumber: bookPageCounts[slug],
         book: verse.book,
-        bookSlug: verse.bookSlug,
+        bookSlug: slug,
         chapter: verse.chapter,
+        chapterName: verse.chapterName,
         verses: [],
       };
       pages.push(currentPage);
@@ -44,6 +50,7 @@ function buildPages(verses: Verse[]): Page[] {
     currentPage!.book = verse.book;
     currentPage!.bookSlug = verse.bookSlug;
     currentPage!.chapter = verse.chapter;
+    currentPage!.chapterName = verse.chapterName;
   }
 
   return pages;

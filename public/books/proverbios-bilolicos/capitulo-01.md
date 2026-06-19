@@ -1,4 +1,4 @@
-# Capítulo 1
+# Capítulo 1: A Sabedoria dos Justos
 
 [1] O mais sábio dos Boingadores disse: melhor um boing certo do que mil boings errados.
 

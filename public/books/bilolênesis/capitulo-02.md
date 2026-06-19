@@ -1,4 +1,4 @@
-# Capítulo 2: A Serpente e o Furico
+# Capítulo 2
 
 [1] Depois da criação, Bilola decidiu criar os seres que habitariam a Boingaterra.
 

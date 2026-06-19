@@ -13,6 +13,7 @@ export interface Verse {
   book: string;
   bookSlug: string;
   chapter: number;
+  chapterName?: string;
   verse: number;
   text: string;
   page: number;
@@ -20,9 +21,11 @@ export interface Verse {
 
 export interface Page {
   pageNumber: number;
+  localPageNumber: number;
   book: string;
   bookSlug: string;
   chapter: number;
+  chapterName?: string;
   verses: Verse[];
 }
 

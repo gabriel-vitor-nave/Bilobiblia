@@ -1,4 +1,4 @@
-# Capítulo 1
+# Capítulo 1: As Leis do Monte Bilola
 
 [1] Estes são os mandamentos que Bilola entregou ao povo do boing no alto do Monte Boingo.
 

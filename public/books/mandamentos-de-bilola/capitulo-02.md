@@ -1,4 +1,4 @@
-# Capítulo 2
+# Capítulo 2: A Quebra das Tábuas
 
 [1] E Bilola disse mais: além dos dez mandamentos, há os mandamentos menores, que são igualmente importantes porém menos dramáticos.
 
