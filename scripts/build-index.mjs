@@ -5,16 +5,17 @@
  * with verse-level granularity including pre-computed page numbers.
  *
  * Run: node scripts/build-index.mjs
- * Auto-run: configured in package.json "prebuild" script
+ * Auto-run: configured in package.json "dev" and "build" scripts
  */
 
-import { readFileSync, writeFileSync, readdirSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, readdirSync } from 'fs';
 import { join, resolve } from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const ROOT = resolve(__dirname, '..');
 const BOOKS_DIR = join(ROOT, 'public', 'books');
+const BOOK_INDEX_OUTPUT = join(BOOKS_DIR, 'index.json');
 const OUTPUT = join(ROOT, 'public', 'search-index.json');
 
 // Characters per page (canonical pagination for index)
@@ -22,7 +23,7 @@ const CHARS_PER_PAGE = 700;
 
 /**
  * Parse a single chapter markdown file.
- * Verses are denoted by [N] at the start of a paragraph.
+ * Verses start with [N] and can span multiple markdown lines until the next [N].
  */
 function parseChapter(markdown, bookSlug, bookTitle, chapterNumber) {
   const verses = [];
@@ -38,22 +39,43 @@ function parseChapter(markdown, bookSlug, bookTitle, chapterNumber) {
     }
   }
 
+  let currentVerse = null;
+
+  const pushCurrentVerse = () => {
+    if (!currentVerse) return;
+    const text = currentVerse.lines.join('\n').trim();
+    if (!text) return;
+
+    const verseObj = {
+      book: bookTitle,
+      bookSlug,
+      chapter: chapterNumber,
+      verse: currentVerse.number,
+      text,
+    };
+    if (chapterName) {
+      verseObj.chapterName = chapterName;
+    }
+    verses.push(verseObj);
+  };
+
   for (const line of lines) {
-    const match = line.match(/^\[(\d+)\]\s+(.+)$/);
+    const match = line.match(/^\[(\d+)\]\s*(.*)$/);
     if (match) {
-      const verseObj = {
-        book: bookTitle,
-        bookSlug,
-        chapter: chapterNumber,
-        verse: parseInt(match[1], 10),
-        text: match[2].trim(),
+      pushCurrentVerse();
+      currentVerse = {
+        number: parseInt(match[1], 10),
+        lines: match[2] ? [match[2].trim()] : [],
       };
-      if (chapterName) {
-        verseObj.chapterName = chapterName;
-      }
-      verses.push(verseObj);
+      continue;
+    }
+
+    if (currentVerse) {
+      currentVerse.lines.push(line.trimEnd());
     }
   }
+
+  pushCurrentVerse();
 
   return verses;
 }
@@ -76,18 +98,68 @@ function assignPages(allVerses) {
   });
 }
 
+function getChapterFiles(bookDir) {
+  return readdirSync(bookDir)
+    .filter((f) => f.startsWith('capitulo-') && f.endsWith('.md'))
+    .sort();
+}
+
+function discoverBooks() {
+  const books = [];
+  const entries = readdirSync(BOOKS_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
+
+  for (const slug of entries) {
+    const bookDir = join(BOOKS_DIR, slug);
+    const metadataPath = join(bookDir, 'metadata.json');
+
+    if (!existsSync(metadataPath)) {
+      console.warn(`Skipping ${slug}: missing metadata.json`);
+      continue;
+    }
+
+    const metadata = JSON.parse(readFileSync(metadataPath, 'utf-8'));
+    if (metadata.slug && metadata.slug !== slug) {
+      console.warn(`Skipping ${slug}: metadata.slug is "${metadata.slug}"`);
+      continue;
+    }
+
+    const chapterFiles = getChapterFiles(bookDir);
+    const nextMetadata = {
+      ...metadata,
+      slug,
+      chapters: chapterFiles.length,
+    };
+
+    if (metadata.slug !== nextMetadata.slug || metadata.chapters !== nextMetadata.chapters) {
+      writeFileSync(metadataPath, `${JSON.stringify(nextMetadata, null, 2)}\n`, 'utf-8');
+    }
+
+    books.push({
+      slug,
+      metadata: nextMetadata,
+      chapterFiles,
+    });
+  }
+
+  return books.sort((a, b) => {
+    const orderA = Number.isFinite(a.metadata.order) ? a.metadata.order : Number.MAX_SAFE_INTEGER;
+    const orderB = Number.isFinite(b.metadata.order) ? b.metadata.order : Number.MAX_SAFE_INTEGER;
+    if (orderA !== orderB) return orderA - orderB;
+    return (a.metadata.title ?? a.slug).localeCompare(b.metadata.title ?? b.slug);
+  });
+}
+
 async function main() {
-  const slugs = JSON.parse(readFileSync(join(BOOKS_DIR, 'index.json'), 'utf-8'));
+  const books = discoverBooks();
+  const slugs = books.map((book) => book.slug);
   const allVerses = [];
 
-  for (const slug of slugs) {
-    const bookDir = join(BOOKS_DIR, slug);
-    const metadata = JSON.parse(readFileSync(join(bookDir, 'metadata.json'), 'utf-8'));
+  writeFileSync(BOOK_INDEX_OUTPUT, `${JSON.stringify(slugs, null, 2)}\n`, 'utf-8');
 
-    // Find all chapter files, sorted
-    const chapterFiles = readdirSync(bookDir)
-      .filter((f) => f.startsWith('capitulo-') && f.endsWith('.md'))
-      .sort();
+  for (const { slug, metadata, chapterFiles } of books) {
+    const bookDir = join(BOOKS_DIR, slug);
 
     for (const file of chapterFiles) {
       // Extract chapter number from filename: capitulo-01.md → 1

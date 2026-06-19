@@ -44,7 +44,7 @@ export function Cover() {
         className="relative"
       >
         <motion.button
-          onClick={!isLoading && !loadError ? openBook : undefined}
+          onClick={!isLoading && !loadError ? () => openBook() : undefined}
           whileHover={!isLoading ? { scale: 1.03, rotateY: -3 } : {}}
           whileTap={!isLoading ? { scale: 0.98 } : {}}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}

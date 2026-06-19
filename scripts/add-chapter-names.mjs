@@ -47,7 +47,9 @@ async function main() {
 
   for (const slug of slugs) {
     const bookDir = join(BOOKS_DIR, slug);
-    const names = CHAPTER_NAMES[slug];
+    const metadataPath = join(bookDir, 'metadata.json');
+    const metadata = JSON.parse(readFileSync(metadataPath, 'utf-8'));
+    const names = metadata.chapterNames || {};
     if (!names) {
       console.warn(`⚠️ No names configured for book slug: ${slug}`);
       continue;

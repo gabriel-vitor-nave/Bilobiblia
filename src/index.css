@@ -92,6 +92,52 @@
     @apply font-serif text-verse text-ink-700 leading-relaxed;
   }
 
+  .verse-markdown {
+    @apply min-w-0 flex-1;
+  }
+
+  .verse-markdown p {
+    margin: 0 0 0.45rem;
+    white-space: pre-line;
+  }
+
+  .verse-markdown p:last-child {
+    margin-bottom: 0;
+  }
+
+  .verse-markdown ul,
+  .verse-markdown ol {
+    margin: 0.35rem 0 0.45rem 1.1rem;
+  }
+
+  .verse-markdown ul {
+    list-style: disc;
+  }
+
+  .verse-markdown ol {
+    list-style: decimal;
+  }
+
+  .verse-markdown li {
+    margin: 0.12rem 0;
+    padding-left: 0.15rem;
+  }
+
+  .verse-markdown strong {
+    font-weight: 700;
+  }
+
+  .verse-markdown em {
+    font-style: italic;
+  }
+
+  .verse-markdown blockquote {
+    margin: 0.35rem 0;
+    padding-left: 0.75rem;
+    border-left: 2px solid rgba(201, 168, 76, 0.45);
+    color: #4b2b1a;
+  }
+
   /* Verse number */
   .verse-number {
     @apply font-display text-xs text-gold-500 font-semibold mr-2 select-none;
@@ -161,10 +207,58 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
 
-  /* Favorite heart active */
-  .fav-active {
-    color: #c9a84c;
-    filter: drop-shadow(0 0 4px rgba(201,168,76,0.5));
+  .page-edge {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 44px;
+    z-index: 5;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .page-edge:disabled {
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .page-edge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 36px;
+    opacity: 0;
+    transition: opacity 160ms ease, transform 160ms ease;
+    pointer-events: none;
+  }
+
+  .page-edge-left {
+    left: 0;
+  }
+
+  .page-edge-left::after {
+    left: 0;
+    background: linear-gradient(100deg, rgba(44, 24, 16, 0.2), rgba(255, 248, 235, 0.08) 55%, transparent);
+    transform: skewY(-3deg) translateX(-10px);
+    transform-origin: left center;
+  }
+
+  .page-edge-right {
+    right: 0;
+  }
+
+  .page-edge-right::after {
+    right: 0;
+    background: linear-gradient(260deg, rgba(44, 24, 16, 0.2), rgba(255, 248, 235, 0.08) 55%, transparent);
+    transform: skewY(3deg) translateX(10px);
+    transform-origin: right center;
+  }
+
+  .page-edge:not(:disabled):hover::after {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
@@ -175,9 +269,6 @@
   .text-balance { text-wrap: balance; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-  /* Prevent select on book UI elements */
-  .book-ui { user-select: none; }
 
   /* Safe height */
   .h-dvh { height: 100dvh; }

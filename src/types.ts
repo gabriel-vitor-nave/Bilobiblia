@@ -29,16 +29,6 @@ export interface Page {
   verses: Verse[];
 }
 
-export interface FavoriteRef {
-  book: string;
-  bookSlug: string;
-  chapter: number;
-  verse: number;
-  text: string;
-  page: number;
-  savedAt: string;
-}
-
 export interface ReadingHistory {
   page: number;
   book: string;

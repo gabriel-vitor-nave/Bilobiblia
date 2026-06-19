@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { Verse, Page, BookMeta, FavoriteRef, ReadingHistory } from '../types';
+import type { Verse, Page, BookMeta, ReadingHistory } from '../types';
 
 // ─── Paginator ─────────────────────────────────────────────────────────────
 
@@ -73,10 +73,9 @@ interface BookState {
   // UI state
   showLibrary: boolean;
   showSearch: boolean;
-  showFavorites: boolean;
+  searchHistory: string[];
 
   // Persistent
-  favorites: FavoriteRef[];
   history: ReadingHistory | null;
 }
 
@@ -85,7 +84,7 @@ interface BookActions {
   loadContent: () => Promise<void>;
 
   // Navigation
-  openBook: () => void;
+  openBook: (page?: number) => void;
   closeBook: () => void;
   goToPage: (page: number) => void;
   goToVerse: (bookSlug: string, chapter: number, verse: number) => void;
@@ -95,13 +94,11 @@ interface BookActions {
   // UI toggles
   toggleLibrary: () => void;
   toggleSearch: () => void;
-  toggleFavorites: () => void;
   closeAllPanels: () => void;
 
-  // Favorites
-  addFavorite: (verse: Verse) => void;
-  removeFavorite: (bookSlug: string, chapter: number, verse: number) => void;
-  isFavorite: (bookSlug: string, chapter: number, verse: number) => boolean;
+  // Search history
+  addSearchHistory: (query: string) => void;
+  removeSearchHistory: (query: string) => void;
 
   // History
   saveHistory: () => void;
@@ -122,8 +119,7 @@ export const useBookStore = create<BookState & BookActions>()(
       loadError: null,
       showLibrary: false,
       showSearch: false,
-      showFavorites: false,
-      favorites: [],
+      searchHistory: [],
       history: null,
 
       // ── Content loading ────────────────────────────────────────────────
@@ -160,11 +156,17 @@ export const useBookStore = create<BookState & BookActions>()(
       },
 
       // ── Navigation ─────────────────────────────────────────────────────
-      openBook: () => {
-        const { history } = get();
+      openBook: (page) => {
+        const { history, pages } = get();
+        const historyPage = history ? history.page - 1 : 0;
+        const targetPage =
+          typeof page === 'number'
+            ? Math.max(0, Math.min(page, pages.length - 1))
+            : historyPage;
+
         set({
           isOpen: true,
-          currentPage: history ? history.page - 1 : 0,
+          currentPage: targetPage,
         });
       },
 
@@ -213,52 +215,33 @@ export const useBookStore = create<BookState & BookActions>()(
         set((s) => ({
           showLibrary: !s.showLibrary,
           showSearch: false,
-          showFavorites: false,
         })),
 
       toggleSearch: () =>
         set((s) => ({
           showSearch: !s.showSearch,
           showLibrary: false,
-          showFavorites: false,
-        })),
-
-      toggleFavorites: () =>
-        set((s) => ({
-          showFavorites: !s.showFavorites,
-          showLibrary: false,
-          showSearch: false,
         })),
 
       closeAllPanels: () =>
-        set({ showLibrary: false, showSearch: false, showFavorites: false }),
+        set({ showLibrary: false, showSearch: false }),
 
-      // ── Favorites ──────────────────────────────────────────────────────
-      addFavorite: (verse) => {
-        const ref: FavoriteRef = {
-          book: verse.book,
-          bookSlug: verse.bookSlug,
-          chapter: verse.chapter,
-          verse: verse.verse,
-          text: verse.text,
-          page: verse.page,
-          savedAt: new Date().toISOString(),
-        };
-        set((s) => ({ favorites: [...s.favorites, ref] }));
-      },
-
-      removeFavorite: (bookSlug, chapter, verse) => {
+      // ── Search history ─────────────────────────────────────────────────
+      addSearchHistory: (query) => {
+        const normalized = query.trim();
+        if (!normalized) return;
         set((s) => ({
-          favorites: s.favorites.filter(
-            (f) => !(f.bookSlug === bookSlug && f.chapter === chapter && f.verse === verse)
-          ),
+          searchHistory: [
+            normalized,
+            ...s.searchHistory.filter((item) => item.toLowerCase() !== normalized.toLowerCase()),
+          ].slice(0, 12),
         }));
       },
 
-      isFavorite: (bookSlug, chapter, verse) => {
-        return get().favorites.some(
-          (f) => f.bookSlug === bookSlug && f.chapter === chapter && f.verse === verse
-        );
+      removeSearchHistory: (query) => {
+        set((s) => ({
+          searchHistory: s.searchHistory.filter((item) => item !== query),
+        }));
       },
 
       // ── History ────────────────────────────────────────────────────────
@@ -281,7 +264,7 @@ export const useBookStore = create<BookState & BookActions>()(
       name: 'bilobiblia-storage',
       // Only persist user data, not content (content is fetched fresh)
       partialize: (state) => ({
-        favorites: state.favorites,
+        searchHistory: state.searchHistory,
         history: state.history,
       }),
     }

@@ -5,7 +5,6 @@ import { DesktopBook } from '../components/Book/DesktopBook';
 import { MobileReader } from '../components/MobileReader/MobileReader';
 import { Library } from '../components/Library/Library';
 import { Search } from '../components/Search/Search';
-import { Favorites } from '../components/Favorites/Favorites';
 
 export function Reader() {
   const { bookSlug, pageNumber } = useParams();
@@ -48,18 +47,18 @@ export function Reader() {
 
       if (targetPage) {
         const targetIdx = targetPage.pageNumber - 1;
-        if (currentPage !== targetIdx) {
+        if (useBookStore.getState().currentPage !== targetIdx) {
           goToPage(targetIdx);
         }
         if (!isOpen) {
-          openBook();
+          openBook(targetIdx);
         }
       } else {
         // Fallback if page not found
         navigate('/', { replace: true });
       }
     }
-  }, [bookSlug, pageNumber, pages, currentPage, isOpen, goToPage, openBook, navigate]);
+  }, [bookSlug, pageNumber, pages, isOpen, goToPage, openBook, navigate]);
 
   // Sync store currentPage changes to URL
   useEffect(() => {
@@ -91,14 +90,13 @@ export function Reader() {
   }
 
   return (
-    <div className="relative min-h-dvh overflow-hidden select-none">
+    <div className="relative min-h-dvh overflow-hidden">
       {/* Reader View */}
       {isMobile ? <MobileReader /> : <DesktopBook />}
 
       {/* Sidebars / Modals */}
       <Library />
       <Search />
-      <Favorites />
     </div>
   );
 }
